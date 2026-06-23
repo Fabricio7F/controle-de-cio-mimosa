@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Cio — Bovinos</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a5c3a">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1a5c3a;
+    --verde-claro: #2d8a56;
+    --verde-bg: #eef7f2;
+    --cinza: #f5f3ef;
+    --texto: #1c1c1a;
+    --texto2: #5a5a55;
+    --borda: #d6d3cc;
+    --branco: #fff;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #f0ede6; color: var(--texto); min-height: 100vh; padding: 0 0 60px; }
+  header { background: var(--verde); color: #fff; padding: 28px 24px 22px; text-align: center; }
+  header h1 { font-family: 'DM Serif Display', serif; font-size: 26px; font-weight: 400; margin-bottom: 4px; }
+  header p { font-size: 13px; opacity: 0.75; }
+  .container { max-width: 520px; margin: 0 auto; padding: 0 16px; }
+  .card { background: var(--branco); border-radius: var(--radius); padding: 20px; margin-top: 16px; border: 1px solid var(--borda); }
+  .card-title { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--verde); margin-bottom: 14px; }
+  label { font-size: 13px; color: var(--texto2); display: block; margin-bottom: 5px; }
+  input[type="text"], input[type="date"] { width: 100%; border: 1px solid var(--borda); border-radius: var(--radius-sm); padding: 11px 14px; font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--texto); background: var(--cinza); outline: none; transition: border 0.15s; margin-bottom: 14px; -webkit-appearance: none; }
+  input:focus { border-color: var(--verde-claro); background: #fff; }
+  .btn-row { display: flex; gap: 10px; margin-top: 4px; }
+  button { border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; padding: 11px 18px; transition: opacity 0.15s, transform 0.1s; }
+  button:active { transform: scale(0.97); }
+  .btn-hoje { background: var(--verde-bg); color: var(--verde); flex-shrink: 0; }
+  .btn-calcular { background: var(--verde); color: #fff; flex: 1; }
+  .resultado-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--cinza); }
+  .resultado-item:last-child { border-bottom: none; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .resultado-info { flex: 1; }
+  .resultado-titulo { font-size: 13px; color: var(--texto2); margin-bottom: 2px; }
+  .resultado-data { font-size: 17px; font-weight: 500; color: var(--texto); }
+  .resultado-faltam { font-size: 12px; color: var(--texto2); text-align: right; flex-shrink: 0; min-width: 70px; }
+  .relatorio-box { background: var(--cinza); border: 1px solid var(--borda); border-radius: var(--radius-sm); padding: 14px; font-size: 13px; line-height: 1.8; white-space: pre-wrap; font-family: monospace; color: var(--texto); margin-top: 14px; }
+  .btn-copiar { width: 100%; background: var(--cinza); color: var(--verde); border: 1px solid var(--borda); margin-top: 10px; }
+  .btn-copiar.copiado { background: var(--verde-bg); }
+  #secao-resultado { display: none; }
+  .linha-topo { height: 4px; background: var(--verde); margin: -20px -20px 18px -20px; border-radius: var(--radius) var(--radius) 0 0; }
+  .historico-item { background: var(--cinza); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; transition: border 0.15s; }
+  .historico-item:hover { border-color: var(--borda); }
+  .historico-nome { font-size: 14px; font-weight: 500; }
+  .historico-cio { font-size: 12px; color: var(--texto2); }
+  .btn-limpar { background: none; color: #c04040; font-size: 12px; padding: 4px 8px; border: 1px solid #e8b8b8; border-radius: 6px; float: right; margin-top: -2px; }
+  #secao-historico { display: none; }
+  .footer-note { text-align: center; font-size: 12px; color: var(--texto2); margin-top: 28px; opacity: 0.7; }
+  .regras-box { background: var(--verde-bg); border: 1px solid #b2d9c4; border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px; color: var(--verde); line-height: 1.9; margin-top: 14px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🐄 Controle de Cio</h1>
+  <p>Previsão de parto e manejo reprodutivo bovino</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <div class="linha-topo"></div>
+    <div class="card-title">Novo registro</div>
+
+    <label>Nome ou número da vaca</label>
+    <input type="text" id="nome" placeholder="Ex: Preguiça, nº 42..." />
+
+    <label>Data da gestação / cio detectado</label>
+    <input type="date" id="data-cio" />
+
+    <div class="btn-row">
+      <button class="btn-hoje" onclick="usarHoje()">📅 Hoje</button>
+      <button class="btn-calcular" onclick="calcular()">Calcular datas</button>
+    </div>
+
+    <div class="regras-box">
+      🟢 Parto = gestação + 9 meses e 10 dias<br>
+      🔴 Secagem = 60 dias antes do parto<br>
+      🟡 Pré-parto = 20 dias antes do parto
+    </div>
+  </div>
+
+  <div id="secao-resultado">
+    <div class="card">
+      <div class="card-title">Datas calculadas</div>
+
+      <div class="resultado-item">
+        <div class="dot" style="background:#1a5c3a;"></div>
+        <div class="resultado-info">
+          <div class="resultado-titulo">Previsão de parto (+ 9 meses e 10 dias)</div>
+          <div class="resultado-data" id="res-parto">—</div>
+        </div>
+        <div class="resultado-faltam" id="faltam-parto"></div>
+      </div>
+
+      <div class="resultado-item">
+        <div class="dot" style="background:#a83060;"></div>
+        <div class="resultado-info">
+          <div class="resultado-titulo">Secagem da vaca (60 dias antes do parto)</div>
+          <div class="resultado-data" id="res-secagem">—</div>
+        </div>
+        <div class="resultado-faltam" id="faltam-secagem"></div>
+      </div>
+
+      <div class="resultado-item">
+        <div class="dot" style="background:#c47a1a;"></div>
+        <div class="resultado-info">
+          <div class="resultado-titulo">Pré-parto (20 dias antes do parto)</div>
+          <div class="resultado-data" id="res-preparto">—</div>
+        </div>
+        <div class="resultado-faltam" id="faltam-preparto"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Relatório para o veterinário</div>
+      <div class="relatorio-box" id="relatorio-texto"></div>
+      <button class="btn-copiar" id="btn-copiar" onclick="copiarRelatorio()">📋 Copiar relatório</button>
+      <button class="btn-calcular" style="width:100%; margin-top:8px;" onclick="salvarNoHistorico()">💾 Salvar no histórico</button>
+    </div>
+  </div>
+
+  <div class="card" id="secao-historico">
+    <div class="card-title">
+      Histórico
+      <button class="btn-limpar" onclick="limparHistorico()">Limpar tudo</button>
+    </div>
+    <div id="lista-historico"></div>
+  </div>
+
+  <p class="footer-note">Funciona offline · Dados salvos no seu aparelho</p>
+</div>
+
+<script>
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const DIAS_SEMANA = ['dom','seg','ter','qua','qui','sex','sáb'];
+
+function usarHoje() {
+  const h = new Date();
+  document.getElementById('data-cio').value = h.toISOString().split('T')[0];
+}
+
+function addMesesDias(base, meses, dias) {
+  const d = new Date(base);
+  d.setMonth(d.getMonth() + meses);
+  d.setDate(d.getDate() + dias);
+  return d;
+}
+
+function addDias(base, dias) {
+  const d = new Date(base);
+  d.setDate(d.getDate() + dias);
+  return d;
+}
+
+function formatarData(d) {
+  return `${DIAS_SEMANA[d.getDay()]}, ${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`;
+}
+
+function formatarDataCurta(d) {
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+function diasAte(d) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const diff = Math.round((d - hoje) / 86400000);
+  if (diff === 0) return 'hoje';
+  if (diff === 1) return 'amanhã';
+  if (diff > 0) return `em ${diff} dias`;
+  return `há ${Math.abs(diff)} dias`;
+}
+
+let dadosAtuais = null;
+
+function calcular() {
+  const val = document.getElementById('data-cio').value;
+  if (!val) { alert('Por favor, informe a data da gestação.'); return; }
+
+  const cio      = new Date(val + 'T12:00:00');
+  const parto    = addMesesDias(cio, 9, 10);
+  const secagem  = addDias(parto, -60);
+  const preparto = addDias(parto, -20);
+
+  document.getElementById('res-parto').textContent     = formatarData(parto);
+  document.getElementById('faltam-parto').textContent  = diasAte(parto);
+  document.getElementById('res-secagem').textContent   = formatarData(secagem);
+  document.getElementById('faltam-secagem').textContent= diasAte(secagem);
+  document.getElementById('res-preparto').textContent  = formatarData(preparto);
+  document.getElementById('faltam-preparto').textContent= diasAte(preparto);
+
+  const nome = document.getElementById('nome').value.trim() || 'Não informado';
+  const hoje = formatarDataCurta(new Date());
+
+  const relatorio =
+`RELATÓRIO DE GESTAÇÃO BOVINA
+Emitido em: ${hoje}
+Animal: ${nome}
+
+Gestação detectada: ${formatarDataCurta(cio)}
+Previsão de parto:  ${formatarDataCurta(parto)}
+Secagem da vaca:    ${formatarDataCurta(secagem)}
+Pré-parto (alerta): ${formatarDataCurta(preparto)}`;
+
+  document.getElementById('relatorio-texto').textContent = relatorio;
+  document.getElementById('secao-resultado').style.display = 'block';
+  document.getElementById('btn-copiar').textContent = '📋 Copiar relatório';
+  document.getElementById('btn-copiar').classList.remove('copiado');
+
+  dadosAtuais = { nome, cio: val, parto: formatarDataCurta(parto), secagem: formatarDataCurta(secagem), preparto: formatarDataCurta(preparto), relatorio };
+
+  document.getElementById('secao-resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copiarRelatorio() {
+  const txt = document.getElementById('relatorio-texto').textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.getElementById('btn-copiar');
+    btn.textContent = '✅ Copiado!';
+    btn.classList.add('copiado');
+    setTimeout(() => { btn.textContent = '📋 Copiar relatório'; btn.classList.remove('copiado'); }, 2500);
+  }).catch(() => { prompt('Copie o texto abaixo:', txt); });
+}
+
+function salvarNoHistorico() {
+  if (!dadosAtuais) return;
+  const historico = JSON.parse(localStorage.getItem('cio-historico') || '[]');
+  historico.unshift({ ...dadosAtuais, id: Date.now() });
+  localStorage.setItem('cio-historico', JSON.stringify(historico.slice(0, 50)));
+  renderHistorico();
+  alert('Salvo no histórico!');
+}
+
+function renderHistorico() {
+  const historico = JSON.parse(localStorage.getItem('cio-historico') || '[]');
+  const sec = document.getElementById('secao-historico');
+  const lista = document.getElementById('lista-historico');
+  if (historico.length === 0) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  lista.innerHTML = historico.map(h => `
+    <div class="historico-item" onclick="carregarHistorico(${h.id})">
+      <div class="historico-nome">${h.nome}</div>
+      <div class="historico-cio">Gestação: ${h.cio} &nbsp;·&nbsp; Parto previsto: ${h.parto}</div>
+    </div>
+  `).join('');
+}
+
+function carregarHistorico(id) {
+  const historico = JSON.parse(localStorage.getItem('cio-historico') || '[]');
+  const h = historico.find(x => x.id === id);
+  if (!h) return;
+  document.getElementById('nome').value = h.nome === 'Não informado' ? '' : h.nome;
+  document.getElementById('data-cio').value = h.cio;
+  calcular();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function limparHistorico() {
+  if (confirm('Apagar todo o histórico?')) {
+    localStorage.removeItem('cio-historico');
+    renderHistorico();
+  }
+}
+
+usarHoje();
+renderHistorico();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+</script>
+</body>
+</html>
