@@ -32,6 +32,13 @@
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Tela principal do Controle de Cio"
+    },
+    {
+      "src": "screenshots/screenshot-2.png",
+      "sizes": "509x711",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Datas calculadas e relatório para o veterinário"
     }
   ],
   "icons": [
