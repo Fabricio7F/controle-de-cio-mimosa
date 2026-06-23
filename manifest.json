@@ -1,14 +1,39 @@
 {
+  "id": "/index.html",
   "name": "Controle de Cio — Bovinos",
   "short_name": "Cio Bovinos",
-  "description": "Previsão de parto e manejo reprodutivo bovino",
+  "description": "Previsão de parto e manejo reprodutivo bovino: calcule data de parto, secagem e pré-parto a partir da data da gestação.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "dir": "ltr",
   "background_color": "#f0ede6",
   "theme_color": "#1a5c3a",
   "orientation": "portrait",
   "lang": "pt-BR",
+  "categories": ["productivity", "utilities", "lifestyle"],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Novo registro",
+      "short_name": "Novo registro",
+      "description": "Calcular as datas de um novo animal",
+      "url": "./index.html",
+      "icons": [
+        { "src": "icons/icon-192.png", "sizes": "192x192" }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/screenshot-1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tela principal do Controle de Cio"
+    }
+  ],
   "icons": [
     {
       "src": "icons/icon-192.png",
