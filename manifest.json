@@ -1,7 +1,7 @@
 {
   "id": "/index.html",
-  "name": "Controle de Cio — Bovinos",
-  "short_name": "Cio Bovinos",
+  "name": "BoviGest – Gestação Bovina",
+  "short_name": "Gestação Bovina",
   "description": "Previsão de parto e manejo reprodutivo bovino: calcule data de parto, secagem e pré-parto a partir da data da gestação.",
   "start_url": "./index.html",
   "scope": "./",
